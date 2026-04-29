@@ -1,0 +1,404 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model brand {
+  id          BigInt   @id @default(autoincrement())
+  name        String?  @db.VarChar(100)
+  logo        String?  @db.VarChar(255)
+  create_time DateTime @default(now()) @db.Timestamp(6)
+  update_time DateTime @default(now()) @db.Timestamp(6)
+  is_deleted  Int      @default(0) @db.SmallInt
+}
+
+model category {
+  id          BigInt   @id @default(autoincrement())
+  name        String?  @db.VarChar(50)
+  image_url   String?  @db.VarChar(200)
+  parent_id   BigInt?
+  status      Int?     @db.SmallInt
+  order_num   Int?
+  create_time DateTime @default(now()) @db.Timestamp(6)
+  update_time DateTime @default(now()) @db.Timestamp(6)
+  is_deleted  Int      @default(0) @db.SmallInt
+}
+
+model category_brand {
+  id          BigInt   @id @default(autoincrement())
+  brand_id    BigInt?
+  category_id BigInt?
+  create_time DateTime @default(now()) @db.Timestamp(6)
+  update_time DateTime @default(now()) @db.Timestamp(6)
+  is_deleted  Int      @default(0) @db.SmallInt
+}
+
+model coupon_info {
+  id               BigInt    @id @default(autoincrement())
+  coupon_type      Int       @default(1) @db.SmallInt
+  coupon_name      String?   @db.VarChar(100)
+  amount           Decimal   @default(0.00) @db.Decimal(10, 2)
+  condition_amount Decimal   @default(0.00) @db.Decimal(10, 2)
+  start_time       DateTime? @db.Date
+  end_time         DateTime? @db.Date
+  range_type       Int       @default(1) @db.SmallInt
+  range_desc       String?   @db.VarChar(200)
+  publish_count    Int       @default(1)
+  per_limit        Int       @default(1)
+  use_count        Int       @default(0)
+  receive_count    Int       @default(0)
+  expire_time      DateTime? @db.Timestamp(6)
+  publish_status   Int?      @db.SmallInt
+  create_time      DateTime  @default(now()) @db.Timestamp(6)
+  update_time      DateTime  @default(now()) @db.Timestamp(6)
+  is_deleted       Int       @default(0) @db.SmallInt
+}
+
+model coupon_range {
+  id          BigInt   @id @default(autoincrement())
+  coupon_id   BigInt   @default(0)
+  range_type  Int      @default(1) @db.SmallInt
+  range_id    BigInt   @default(0)
+  create_time DateTime @default(now()) @db.Timestamp(6)
+  update_time DateTime @default(now()) @db.Timestamp(6)
+  is_deleted  Int      @default(0) @db.SmallInt
+}
+
+model coupon_user {
+  id            BigInt    @id @default(autoincrement())
+  coupon_id     BigInt?
+  user_id       BigInt?
+  order_id      BigInt?
+  coupon_status Int?      @db.SmallInt
+  get_type      Int       @default(2) @db.SmallInt
+  get_time      DateTime? @db.Timestamp(6)
+  using_time    DateTime? @db.Timestamp(6)
+  used_time     DateTime? @db.Timestamp(6)
+  expire_time   DateTime? @db.Timestamp(6)
+  create_time   DateTime  @default(now()) @db.Timestamp(6)
+  update_time   DateTime  @default(now()) @db.Timestamp(6)
+  is_deleted    Int       @default(0) @db.SmallInt
+}
+
+model order_info {
+  id                    BigInt    @id @default(autoincrement())
+  user_id               BigInt    @default(0)
+  nick_name             String?   @db.VarChar(200)
+  order_no              String    @default("") @db.Char(64)
+  coupon_id             BigInt?
+  total_amount          Decimal   @default(0.00) @db.Decimal(10, 2)
+  coupon_amount         Decimal   @default(0.00) @db.Decimal(10, 2)
+  original_total_amount Decimal   @default(0.00) @db.Decimal(10, 2)
+  feight_fee            Decimal   @default(0.00) @db.Decimal(10, 2)
+  pay_type              Int?      @db.SmallInt
+  order_status          Int       @default(0) @db.SmallInt
+  receiver_name         String?   @db.VarChar(100)
+  receiver_phone        String?   @db.VarChar(32)
+  receiver_tag_name     String?   @db.VarChar(32)
+  receiver_province     BigInt?
+  receiver_city         BigInt?
+  receiver_district     BigInt?
+  receiver_address      String?   @db.VarChar(200)
+  payment_time          DateTime? @db.Timestamp(6)
+  delivery_time         DateTime? @db.Timestamp(6)
+  receive_time          DateTime? @db.Timestamp(6)
+  remark                String?   @db.VarChar(500)
+  cancel_time           DateTime? @db.Timestamp(6)
+  cancel_reason         String?   @db.VarChar(255)
+  create_time           DateTime  @default(now()) @db.Timestamp(6)
+  update_time           DateTime  @default(now()) @db.Timestamp(6)
+  is_deleted            Int       @default(0) @db.SmallInt
+}
+
+model order_item {
+  id          BigInt   @id @default(autoincrement())
+  order_id    BigInt?
+  sku_id      BigInt?
+  sku_name    String?  @db.VarChar(255)
+  thumb_img   String?  @db.VarChar(500)
+  sku_price   Decimal? @db.Decimal(10, 2)
+  sku_num     Int?
+  create_time DateTime @default(now()) @db.Timestamp(6)
+  update_time DateTime @default(now()) @db.Timestamp(6)
+  is_deleted  Int      @default(0) @db.SmallInt
+}
+
+model order_log {
+  id             BigInt   @id @default(autoincrement())
+  order_id       BigInt?
+  operate_user   String?  @db.VarChar(100)
+  process_status Int?
+  note           String?  @db.VarChar(500)
+  create_time    DateTime @default(now()) @db.Timestamp(6)
+  update_time    DateTime @default(now()) @db.Timestamp(6)
+  is_deleted     Int      @default(0) @db.SmallInt
+}
+
+model order_statistics {
+  id            BigInt    @id @default(autoincrement())
+  province_code String?   @db.VarChar(20)
+  order_date    DateTime? @db.Date
+  total_amount  Decimal?  @db.Decimal(10, 2)
+  total_num     Int?
+  create_time   DateTime  @default(now()) @db.Timestamp(6)
+  update_time   DateTime  @default(now()) @db.Timestamp(6)
+  is_deleted    Int       @default(0) @db.SmallInt
+}
+
+model payment_info {
+  id               Int       @id @default(autoincrement())
+  user_id          BigInt?
+  order_no         String    @default("") @db.VarChar(50)
+  pay_type         Int       @default(0) @db.SmallInt
+  out_trade_no     String?   @db.VarChar(50)
+  amount           Decimal?  @db.Decimal(10, 2)
+  content          String?   @db.VarChar(200)
+  payment_status   String?   @db.Char(4)
+  callback_time    DateTime? @db.Timestamp(6)
+  callback_content String?
+  create_time      DateTime  @default(now()) @db.Timestamp(6)
+  update_time      DateTime  @default(now()) @db.Timestamp(6)
+  is_deleted       Int       @default(0) @db.SmallInt
+
+  @@index([order_no], map: "payment_info_uniq_order_no_idx")
+}
+
+model product {
+  id            BigInt   @id @default(autoincrement())
+  name          String?  @db.VarChar(255)
+  brand_id      BigInt?
+  category1_id  BigInt?
+  category2_id  BigInt?
+  category3_id  BigInt?
+  unit_name     String?  @db.VarChar(50)
+  slider_urls   String?
+  spec_value    String?  @db.VarChar(255)
+  status        Int      @default(0) @db.SmallInt
+  audit_status  Int      @default(0) @db.SmallInt
+  audit_message String?  @db.VarChar(255)
+  create_time   DateTime @default(now()) @db.Timestamp(6)
+  update_time   DateTime @default(now()) @db.Timestamp(6)
+  is_deleted    Int      @default(0) @db.SmallInt
+}
+
+model product_attr {
+  id          BigInt   @id @default(autoincrement())
+  product_id  BigInt?
+  attr_key    String?  @db.VarChar(255)
+  attr_value  String?  @db.VarChar(255)
+  create_time DateTime @default(now()) @db.Timestamp(6)
+  update_time DateTime @default(now()) @db.Timestamp(6)
+  is_deleted  Int      @default(0) @db.SmallInt
+}
+
+model product_details {
+  id          BigInt   @id @default(autoincrement())
+  product_id  BigInt?
+  image_urls  String?
+  create_time DateTime @default(now()) @db.Timestamp(6)
+  update_time DateTime @default(now()) @db.Timestamp(6)
+  is_deleted  Int      @default(0) @db.SmallInt
+}
+
+model product_sku {
+  id           BigInt   @id @default(autoincrement())
+  sku_code     String?  @db.VarChar(30)
+  sku_name     String?  @db.VarChar(255)
+  product_id   BigInt?
+  thumb_img    String?  @db.VarChar(255)
+  sale_price   Decimal? @db.Decimal(10, 2)
+  market_price Decimal? @db.Decimal(10, 2)
+  cost_price   Decimal? @db.Decimal(10, 2)
+  stock_num    Int?
+  sale_num     Int      @default(0)
+  sku_spec     String?  @default("") @db.VarChar(255)
+  weight       Decimal? @db.Decimal(10, 2)
+  volume       Decimal? @db.Decimal(10, 2)
+  status       Int?     @db.SmallInt
+  create_time  DateTime @default(now()) @db.Timestamp(6)
+  update_time  DateTime @default(now()) @db.Timestamp(6)
+  is_deleted   Int      @default(0) @db.SmallInt
+}
+
+model product_spec {
+  id          BigInt   @id @default(autoincrement())
+  spec_name   String?  @db.VarChar(100)
+  spec_value  String?
+  create_time DateTime @default(now()) @db.Timestamp(6)
+  update_time DateTime @default(now()) @db.Timestamp(6)
+  is_deleted  Int      @default(0) @db.SmallInt
+}
+
+model product_unit {
+  id          BigInt   @id @default(autoincrement())
+  name        String?  @db.VarChar(255)
+  create_time DateTime @default(now()) @db.Timestamp(6)
+  update_time DateTime @default(now()) @db.Timestamp(6)
+  is_deleted  Int      @default(0) @db.SmallInt
+}
+
+model region {
+  id          BigInt   @id @default(autoincrement())
+  code        String?  @unique(map: "idx_code") @db.VarChar(10)
+  parent_code BigInt?
+  name        String?  @db.VarChar(20)
+  level       Int?
+  create_time DateTime @default(now()) @db.Timestamp(6)
+  update_time DateTime @default(now()) @db.Timestamp(6)
+  is_deleted  Int      @default(0) @db.SmallInt
+}
+
+model sys_login_log {
+  id          BigInt    @id @default(autoincrement())
+  username    String?   @default("") @db.VarChar(50)
+  ipaddr      String?   @default("") @db.VarChar(128)
+  status      Int?      @default(0) @db.SmallInt
+  msg         String?   @default("") @db.VarChar(255)
+  access_time DateTime? @db.Timestamp(6)
+  create_time DateTime  @default(now()) @db.Timestamp(6)
+  update_time DateTime? @db.Timestamp(6)
+  is_deleted  Int       @default(0) @db.SmallInt
+}
+
+model sys_menu {
+  id          BigInt   @id @default(autoincrement())
+  parent_id   BigInt   @default(0)
+  title       String   @default("") @db.VarChar(20)
+  component   String?  @db.VarChar(100)
+  sort_value  Int      @default(1)
+  status      Int      @default(1) @db.SmallInt
+  create_time DateTime @default(now()) @db.Timestamp(6)
+  update_time DateTime @default(now()) @db.Timestamp(6)
+  is_deleted  Int      @default(0) @db.SmallInt
+
+  @@index([parent_id], map: "sys_menu_idx_parent_id_idx")
+}
+
+model sys_oper_log {
+  id             BigInt    @id @default(autoincrement())
+  title          String?   @default("") @db.VarChar(50)
+  method         String?   @default("") @db.VarChar(100)
+  request_method String?   @default("") @db.VarChar(10)
+  operator_type  String?   @default("0") @db.VarChar(20)
+  oper_name      String?   @default("") @db.VarChar(50)
+  oper_url       String?   @default("") @db.VarChar(255)
+  oper_ip        String?   @default("") @db.VarChar(128)
+  oper_param     String?   @default("") @db.VarChar(2000)
+  json_result    String?   @default("") @db.VarChar(2000)
+  status         Int?      @default(0)
+  error_msg      String?   @default("") @db.VarChar(2000)
+  create_time    DateTime  @default(now()) @db.Timestamp(6)
+  update_time    DateTime? @db.Timestamp(6)
+  is_deleted     Int       @default(0) @db.SmallInt
+}
+
+model sys_role {
+  id          BigInt   @id @default(autoincrement())
+  role_name   String   @default("") @db.VarChar(20)
+  role_code   String?  @db.VarChar(20)
+  description String?  @db.VarChar(255)
+  create_time DateTime @default(now()) @db.Timestamp(6)
+  update_time DateTime @default(now()) @db.Timestamp(6)
+  is_deleted  Int      @default(0) @db.SmallInt
+}
+
+model sys_role_menu {
+  id          BigInt   @id @default(autoincrement())
+  role_id     BigInt   @default(0)
+  menu_id     BigInt   @default(0)
+  create_time DateTime @default(now()) @db.Timestamp(6)
+  update_time DateTime @default(now()) @db.Timestamp(6)
+  is_deleted  Int      @default(0) @db.SmallInt
+  is_half     Int?     @db.SmallInt
+
+  @@index([menu_id], map: "sys_role_menu_idx_menu_id_idx")
+  @@index([role_id], map: "sys_role_menu_idx_role_id_idx")
+}
+
+model sys_user {
+  id          BigInt   @id @default(autoincrement())
+  username    String   @default("") @db.VarChar(20)
+  password    String   @default("") @db.VarChar(32)
+  name        String?  @db.VarChar(50)
+  phone       String?  @db.VarChar(11)
+  avatar      String?  @db.VarChar(255)
+  description String?  @db.VarChar(255)
+  status      Int      @default(1) @db.SmallInt
+  create_time DateTime @default(now()) @db.Timestamp(6)
+  update_time DateTime @default(now()) @db.Timestamp(6)
+  is_deleted  Int      @default(0) @db.SmallInt
+}
+
+model sys_user_role {
+  id          BigInt   @id @default(autoincrement())
+  role_id     BigInt   @default(0)
+  user_id     BigInt   @default(0)
+  create_time DateTime @default(now()) @db.Timestamp(6)
+  update_time DateTime @default(now()) @db.Timestamp(6)
+  is_deleted  Int      @default(0) @db.SmallInt
+
+  @@index([user_id], map: "sys_user_role_idx_admin_id_idx")
+  @@index([role_id], map: "sys_user_role_idx_role_id_idx")
+}
+
+model user_address {
+  id            Int      @id @default(autoincrement())
+  user_id       Int      @default(0)
+  name          String   @default("") @db.VarChar(20)
+  phone         String   @default("") @db.VarChar(11)
+  tag_name      String?  @db.VarChar(20)
+  province_code String?  @db.VarChar(20)
+  city_code     String?  @db.VarChar(20)
+  district_code String?  @db.VarChar(20)
+  address       String   @default("") @db.VarChar(100)
+  full_address  String?  @db.VarChar(500)
+  is_default    Int      @default(1) @db.SmallInt
+  create_time   DateTime @default(now()) @db.Timestamp(6)
+  update_time   DateTime @default(now()) @db.Timestamp(6)
+  is_deleted    Int      @default(0) @db.SmallInt
+}
+
+model user_browse_history {
+  id          BigInt   @id @default(autoincrement())
+  user_id     BigInt
+  sku_id      BigInt   @default(0)
+  create_time DateTime @default(now()) @db.Timestamp(6)
+  update_time DateTime @default(now()) @db.Timestamp(6)
+  is_deleted  Int      @default(0) @db.SmallInt
+
+  @@index([user_id], map: "user_browse_history_idx_user_id_idx")
+}
+
+model user_collect {
+  id          BigInt   @id @default(autoincrement())
+  user_id     BigInt
+  sku_id      BigInt   @default(0)
+  create_time DateTime @default(now()) @db.Timestamp(6)
+  update_time DateTime @default(now()) @db.Timestamp(6)
+  is_deleted  Int      @default(0) @db.SmallInt
+
+  @@index([user_id], map: "user_collect_idx_user_id_idx")
+}
+
+model user_info {
+  id              BigInt    @id @default(autoincrement())
+  username        String?   @db.VarChar(50)
+  password        String?   @db.VarChar(500)
+  nick_name       String?   @db.VarChar(100)
+  phone           String?   @db.VarChar(17)
+  avatar          String?   @db.VarChar(200)
+  sex             Int?      @db.SmallInt
+  memo            String?   @db.VarChar(100)
+  open_id         String?   @db.VarChar(45)
+  union_id        String?   @db.VarChar(45)
+  last_login_ip   String?   @db.VarChar(50)
+  last_login_time DateTime? @db.Timestamp(6)
+  status          Int?      @db.SmallInt
+  create_time     DateTime  @default(now()) @db.Timestamp(6)
+  update_time     DateTime  @default(now()) @db.Timestamp(6)
+  is_deleted      Int       @default(0) @db.SmallInt
+}

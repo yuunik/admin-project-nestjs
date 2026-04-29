@@ -4,6 +4,6 @@ import { SysUserService } from './sys-user.service';
 
 @Module({
   controllers: [SysUserController],
-  providers: [SysUserService]
+  providers: [SysUserService],
 })
 export class SysUserModule {}
