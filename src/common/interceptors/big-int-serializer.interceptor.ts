@@ -1,4 +1,4 @@
-import {
+﻿import {
   CallHandler,
   ExecutionContext,
   Injectable,
@@ -8,13 +8,13 @@ import { map, Observable } from 'rxjs';
 
 const serializeBigInt = (data: unknown): unknown =>
   JSON.parse(
-    JSON.stringify(data, (_key, value) =>
+    JSON.stringify(data, (_key, value): string | any =>
       typeof value === 'bigint' ? value.toString() : value,
     ),
   );
 
 @Injectable()
-export class BigIntInterceptorInterceptor implements NestInterceptor {
+export class BigIntSerializerInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(map((data) => serializeBigInt(data)));
   }

@@ -1,12 +1,15 @@
-import { NestFactory } from '@nestjs/core';
+﻿import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { BigIntInterceptorInterceptor } from './big-int-interceptor/big-int-interceptor.interceptor';
+import { BigIntSerializerInterceptor } from './common/interceptors/big-int-serializer.interceptor';
+import { ResponseTransformInterceptor } from './common/interceptors/response-transform.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // 拦截器
-  app.useGlobalInterceptors(new BigIntInterceptorInterceptor());
+  app.useGlobalInterceptors(
+    new BigIntSerializerInterceptor(),
+    new ResponseTransformInterceptor(),
+  );
 
   await app.listen(process.env.PORT ?? 3000);
 }
