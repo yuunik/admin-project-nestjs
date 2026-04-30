@@ -1,5 +1,6 @@
 ﻿import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { HttpExceptionFilter } from './common/filters/http-exception/http-exception.filter';
 import { BigIntSerializerInterceptor } from './common/interceptors/big-int-serializer.interceptor';
 import { ResponseTransformInterceptor } from './common/interceptors/response-transform.interceptor';
 
@@ -10,6 +11,8 @@ async function bootstrap() {
     new BigIntSerializerInterceptor(),
     new ResponseTransformInterceptor(),
   );
+
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   await app.listen(process.env.PORT ?? 3000);
 }
