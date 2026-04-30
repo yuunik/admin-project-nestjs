@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class SysUserService {
+  constructor(private prisma: PrismaService) {}
+
   findAll() {
-    return 'This action returns all sysUser';
+    return this.prisma.sys_user.findMany();
   }
 }
