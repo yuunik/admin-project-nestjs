@@ -8,6 +8,7 @@ import { AppService } from './app.service';
 import { AuthGuard } from './common/guards/auth.guard';
 import { PrismaModule } from './database/prisma/prisma.module';
 import { SysUserModule } from './modules/sys-user/sys-user.module';
+import { ValidateCodeModule } from './modules/validate-code/validate-code.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { SysUserModule } from './modules/sys-user/sys-user.module';
     }),
     PrismaModule,
     SysUserModule,
+    ValidateCodeModule,
   ],
   controllers: [AppController],
   providers: [
