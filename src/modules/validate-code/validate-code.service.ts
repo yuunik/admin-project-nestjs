@@ -18,13 +18,14 @@ export class ValidateCodeService {
       background: '#cc9966',
     });
 
-    // const code = captcha.text;
+    const code = captcha.text;
+    const svgData = captcha.data;
     const uuid = crypto.randomUUID();
     const key = uuid.replaceAll('-', '');
 
-    const base64 = Buffer.from(captcha.data, 'utf-8').toString('base64');
+    const base64 = Buffer.from(svgData, 'utf-8').toString('base64');
 
-    await this.cacheManager.set(key, captcha.text, VALIDATE_CODE_TTL);
+    await this.cacheManager.set(key, code, VALIDATE_CODE_TTL);
 
     const url = `data:image/svg+xml;base64,${base64}`;
 
