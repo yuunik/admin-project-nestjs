@@ -3,8 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 
-import { CacheModule } from '@nestjs/cache-manager';
 import { createKeyv } from '@keyv/redis';
+import { CacheModule } from '@nestjs/cache-manager';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthGuard } from './common/guards/auth.guard';
@@ -20,6 +20,7 @@ import { ValidateCodeModule } from './modules/validate-code/validate-code.module
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
+        global: true,
         secret: configService.get<string>('JWT_SECRET') ?? 'spzx-admin-secret',
         signOptions: {
           expiresIn: '7d',

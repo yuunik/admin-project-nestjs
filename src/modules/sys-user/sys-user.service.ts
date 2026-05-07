@@ -1,33 +1,75 @@
-﻿import { Injectable } from '@nestjs/common';
-import SvgCaptcha from 'svg-captcha';
+﻿import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import type { Cache } from 'cache-manager';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { LoginParamsDto } from './dto/login-params.dto';
 
 @Injectable()
 export class SysUserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly jwtService: JwtService,
+  ) {}
 
   findAll() {
     return this.prisma.sys_user.findMany();
   }
 
   // 用户登录
-  login(loginParams: LoginParamsDto) {
-    console.log('登录参数:', loginParams);
-    const captcha = SvgCaptcha.create({
-      size: 4,
-      noise: 2,
-      color: true,
-      background: '#cc9966',
+  async login(loginParams: LoginParamsDto) {
+    const codeKey = loginParams.codeKey;
+    const captcha = loginParams.captcha;
+
+    if (codeKey && captcha) {
+      const cacheCaptcha =
+        (await this.cacheManager.get<string>(`user:validate${codeKey}`)) ?? '';
+
+      console.log('cacheCaptcha', cacheCaptcha, 'captcha', captcha);
+      if (
+        cacheCaptcha &&
+        cacheCaptcha.toLowerCase() === captcha.toLowerCase()
+      ) {
+        await this.cacheManager.del(`user:validate${codeKey}`);
+      } else {
+        throw new UnauthorizedException('验证码错误');
+      }
+    } else {
+      throw new UnauthorizedException('验证码不能为空');
+    }
+
+    const userName = loginParams.username;
+    const user = await this.prisma.sys_user.findFirst({
+      where: { username: userName },
     });
 
-    const base64 = Buffer.from(captcha.data, 'utf-8').toString('base64');
-    const captchaImage = `data:image/svg+xml;base64,${base64}`;
+    if (!user) {
+      throw new UnauthorizedException('用户不存在');
+    }
+
+    const password = loginParams.password;
+    if (user.password !== password) {
+      throw new UnauthorizedException('密码错误');
+    }
+
+    const payload = {
+      sub: user.id.toString(),
+      username: user.username,
+    };
+
+    const token = await this.jwtService.signAsync(payload, {
+      secret: process.env.JWT_SECRET,
+      expiresIn: '1h',
+    });
 
     return {
-      data: captcha.data,
-      text: captcha.text,
-      image: captchaImage,
+      token,
+      user: {
+        id: user.id.toString(),
+        username: user.username,
+        name: user.name,
+      },
     };
   }
 }

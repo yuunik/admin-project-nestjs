@@ -24,8 +24,7 @@ export class ValidateCodeService {
     const key = uuid.replaceAll('-', '');
 
     const base64 = Buffer.from(svgData, 'utf-8').toString('base64');
-
-    await this.cacheManager.set(key, code, VALIDATE_CODE_TTL);
+    await this.cacheManager.set(`user:validate${key}`, code);
 
     const url = `data:image/svg+xml;base64,${base64}`;
 

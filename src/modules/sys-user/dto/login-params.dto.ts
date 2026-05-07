@@ -1,9 +1,4 @@
-import {
-  IsNotEmpty,
-  IsString,
-  IsStrongPassword,
-  Length,
-} from 'class-validator';
+import { IsNotEmpty, IsString, Length } from 'class-validator';
 
 export class LoginParamsDto {
   @IsNotEmpty({ message: '用户名不能为空' })
@@ -13,7 +8,6 @@ export class LoginParamsDto {
 
   @IsNotEmpty({ message: '密码不能为空' })
   @IsString()
-  @IsStrongPassword()
   password: string;
 
   @IsNotEmpty({ message: '验证码不能为空' })
