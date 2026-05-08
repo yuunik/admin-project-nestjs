@@ -2,6 +2,7 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import type { Cache } from 'cache-manager';
+import { USER_VALIDATE_CACHE_KEY_PREFIX } from '../../common/constants/cache-key.constant';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { LoginParamsDto } from './dto/login-params.dto';
 
@@ -23,15 +24,15 @@ export class SysUserService {
     const captcha = loginParams.captcha;
 
     if (codeKey && captcha) {
+      const validateCodeCacheKey = `${USER_VALIDATE_CACHE_KEY_PREFIX}${codeKey}`;
       const cacheCaptcha =
-        (await this.cacheManager.get<string>(`user:validate${codeKey}`)) ?? '';
+        (await this.cacheManager.get<string>(validateCodeCacheKey)) ?? '';
 
-      console.log('cacheCaptcha', cacheCaptcha, 'captcha', captcha);
       if (
         cacheCaptcha &&
         cacheCaptcha.toLowerCase() === captcha.toLowerCase()
       ) {
-        await this.cacheManager.del(`user:validate${codeKey}`);
+        await this.cacheManager.del(validateCodeCacheKey);
       } else {
         throw new UnauthorizedException('验证码错误');
       }
@@ -58,6 +59,7 @@ export class SysUserService {
       username: user.username,
     };
 
+    console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@', process.env);
     const token = await this.jwtService.signAsync(payload, {
       secret: process.env.JWT_SECRET,
       expiresIn: '1h',
