@@ -1,8 +1,9 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 import { Public } from '../../common/decorators/public.decorator';
+import { ValidateCodeService } from '../validate-code/validate-code.service';
 import { LoginParamsDto } from './dto/login-params.dto';
 import { SysUserService } from './sys-user.service';
-import { ValidateCodeService } from '../validate-code/validate-code.service';
 
 @Controller('user')
 export class SysUserController {
@@ -26,5 +27,10 @@ export class SysUserController {
   @Public()
   getCaptcha() {
     return this.validateCodeService.validateCode();
+  }
+
+  @Post('/getUserListByCondition')
+  getUserList(@Body() params: PaginationQueryDto) {
+    return this.sysUserService.queryByCondition(params);
   }
 }

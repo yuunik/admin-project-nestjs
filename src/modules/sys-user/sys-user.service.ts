@@ -2,6 +2,7 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import type { Cache } from 'cache-manager';
+import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 import { USER_VALIDATE_CACHE_KEY_PREFIX } from '../../common/constants/cache-key.constant';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { LoginParamsDto } from './dto/login-params.dto';
@@ -59,7 +60,6 @@ export class SysUserService {
       username: user.username,
     };
 
-    console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@', process.env);
     const token = await this.jwtService.signAsync(payload, {
       secret: process.env.JWT_SECRET,
       expiresIn: '1h',
@@ -72,6 +72,34 @@ export class SysUserService {
         username: user.username,
         name: user.name,
       },
+    };
+  }
+
+  // 分页查询
+  async queryByCondition(queryData: PaginationQueryDto) {
+    const { page, pageSize } = queryData;
+
+    const skip = (page - 1) * pageSize;
+    const take = pageSize;
+
+    const [data, total] = await Promise.all([
+      this.prisma.sys_user.findMany({
+        skip,
+        take,
+        orderBy: { create_time: 'desc' },
+        where: { is_deleted: 0 },
+      }),
+      this.prisma.sys_user.count({}),
+    ]);
+
+    const totalPages = Math.ceil(total / pageSize);
+
+    return {
+      data,
+      total,
+      page,
+      pageSize,
+      totalPages,
     };
   }
 }

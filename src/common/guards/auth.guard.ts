@@ -40,7 +40,8 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      request.user = await this.jwtService.verifyAsync<JwtPayload>(token);
+      const user = await this.jwtService.verifyAsync<JwtPayload>(token);
+      request.user = user;
       return true;
     } catch {
       throw new UnauthorizedException('token 无效或已过期');

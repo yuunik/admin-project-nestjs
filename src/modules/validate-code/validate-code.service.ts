@@ -17,11 +17,10 @@ export class ValidateCodeService {
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
   async validateCode(): Promise<ValidateCodeVo> {
-    console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@', process.env);
     const captcha = SvgCaptcha.create({
       size: 4,
       noise: 2,
-      color: true,
+      color: false,
       background: randomHexColor(),
     });
 
