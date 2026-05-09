@@ -89,7 +89,9 @@ export class SysUserService {
         orderBy: { create_time: 'desc' },
         where: { is_deleted: 0 },
       }),
-      this.prisma.sys_user.count({}),
+      this.prisma.sys_user.count({
+        where: { is_deleted: 0 },
+      }),
     ]);
 
     const totalPages = Math.ceil(total / pageSize);
