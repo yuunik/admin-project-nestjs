@@ -77,20 +77,29 @@ export class SysUserService {
 
   // 分页查询
   async queryByCondition(queryData: PaginationQueryDto) {
-    const { page, pageSize } = queryData;
+    const { page, pageSize, keyword } = queryData;
 
     const skip = (page - 1) * pageSize;
     const take = pageSize;
+
+    const whereCondition = keyword
+      ? {
+          is_deleted: 0,
+          username: {
+            contains: keyword,
+          },
+        }
+      : { is_deleted: 0 };
 
     const [data, total] = await Promise.all([
       this.prisma.sys_user.findMany({
         skip,
         take,
         orderBy: { create_time: 'desc' },
-        where: { is_deleted: 0 },
+        where: whereCondition,
       }),
       this.prisma.sys_user.count({
-        where: { is_deleted: 0 },
+        where: whereCondition,
       }),
     ]);
 

@@ -13,4 +13,7 @@ export class PaginationQueryDto {
   @IsInt()
   @Min(1)
   pageSize: number = 10;
+
+  @IsOptional()
+  keyword?: string;
 }
