@@ -3,7 +3,10 @@ import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import type { Cache } from 'cache-manager';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
-import { USER_VALIDATE_CACHE_KEY_PREFIX } from '../../common/constants/cache-key.constant';
+import {
+  USER_LOGIN_CACHE_KEY_PREFIX,
+  USER_VALIDATE_CACHE_KEY_PREFIX,
+} from '../../common/constants/cache-key.constant';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { LoginParamsDto } from './dto/login-params.dto';
 
@@ -64,6 +67,18 @@ export class SysUserService {
       secret: process.env.JWT_SECRET,
       expiresIn: '1h',
     });
+
+    const { password: _, ...userInfo } = user;
+    const cacheUser = {
+      ...userInfo,
+      id: user.id.toString(),
+    };
+
+    await this.cacheManager.set(
+      `${USER_LOGIN_CACHE_KEY_PREFIX}${token}`,
+      JSON.stringify(cacheUser),
+      7 * 24 * 60 * 60 * 1000,
+    );
 
     return {
       token,
